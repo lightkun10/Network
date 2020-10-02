@@ -3,7 +3,7 @@ from django.db import models
 
 
 class User(AbstractUser):
-    # following, followers, posts, likes?
+    # posts, likes?
     pass
 
 class Follow(models.Model):
