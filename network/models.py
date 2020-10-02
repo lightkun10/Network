@@ -14,7 +14,7 @@ class Post(models.Model):
 
     # Returns string representation of a particular object
     def __str__(self):
-        return f"'{self.text}' by #{self.user}"
+        return f"'{self.text}' by {self.user}"
     
 class Like(models.Model):
     user = models.ForeignKey(User, related_name="likes", on_delete=models.CASCADE)
