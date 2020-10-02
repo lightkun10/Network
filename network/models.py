@@ -7,13 +7,17 @@ class User(AbstractUser):
     pass
 
 class Follow(models.Model):
-    user = models.ForeignKey(User, related_name="user", on_delete=models.CASCADE)
-    user_follow = models.ForeignKey(User, related_name="user_follow", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="followings", on_delete=models.CASCADE)
+    user_follow = models.ForeignKey(User, related_name="followers", on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
 
     # Returns string representation of a particular object
     def __str__(self):
         return f"{self.user} following {self.user_follow} at {self.date}"
+    
+    # Lists that must be unique when considered together.
+    class Meta:
+        unique_together = ("user", "user_follow")
 
 
 """
