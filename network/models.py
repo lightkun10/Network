@@ -11,6 +11,10 @@ class Post(models.Model):
     user = models.ForeignKey(User, related_name="posts", on_delete=models.CASCADE)
     text = models.CharField(max_length=300)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    # Returns string representation of a particular object
+    def __str__(self):
+        return f"'{self.text}' by #{self.user}"
     
 class Like(models.Model):
     user = models.ForeignKey(User, related_name="likes", on_delete=models.CASCADE)
