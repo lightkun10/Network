@@ -2,9 +2,16 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
+# posts, likes?
+
 class User(AbstractUser):
-    # posts, likes?
     pass
+
+class Post(models.Model):
+    user = models.ForeignKey(User, related_name="posts", on_delete=models.CASCADE)
+    text = models.CharField(max_length=300)
+    created_at = models.DateTimeField(auto_now_add=True)
+
 
 class Follow(models.Model):
     user = models.ForeignKey(User, related_name="followings", on_delete=models.CASCADE)
