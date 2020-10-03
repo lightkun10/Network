@@ -1,0 +1,7 @@
+.create-post-section {
+    margin: 0.6em;
+    padding: 0.7em;
+    border: 2px solid gray;
+    border-radius: 5px;
+    border-width: thin;
+}

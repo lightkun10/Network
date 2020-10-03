@@ -1,5 +1,26 @@
+<!-- ALL Post -->
+
 {% extends "network/layout.html" %}
+{% load static %}
 
 {% block body %}
-    TODO
+
+    <h2>All Posts</h2>
+
+    <div class="create-post-section">
+        <h3>New Post</h3>
+        <form action="" method="post">
+            {% csrf_token %}
+
+            <!-- for the 300 char limit -->
+            <textarea class="textarea resize-ta" name="post-text" id="post-text" 
+                rows="4" cols="100"></textarea> <br>
+            <input value="Post" type="submit" class="btn btn-primary">
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'network/index.js' %}"></script>
 {% endblock %}
