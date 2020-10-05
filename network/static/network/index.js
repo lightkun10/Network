@@ -1,10 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
 
+    document.querySelector('#post-text').value = "";    // empty form after/before submitting
 
     /** For JS on index page/all post page */
     document.querySelector('#create-form').onsubmit = function() {
-
-        document.querySelector('#post-text').value = "";    // empty form after/before submitting
 
         fetch('/post', {
             method: 'POST',
