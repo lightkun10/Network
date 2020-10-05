@@ -18,6 +18,7 @@ def index(request):
     else:
         return HttpResponseRedirect(reverse("login"))
 
+
 @csrf_exempt
 @login_required
 def create(request):
@@ -37,6 +38,15 @@ def create(request):
     user.posts.add(new_post)
 
     return JsonResponse({"message": "Post added successfully."}, status=201)
+
+
+@login_required
+def posts(request):
+
+    # Display all available posts
+    posts = Post.objects.order_by("-created_at").all()
+    return JsonResponse([post.serialize() for post in posts], safe=False)
+
 
 def login_view(request):
     if request.method == "POST":

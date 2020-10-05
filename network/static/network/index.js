@@ -2,6 +2,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.querySelector('#post-text').value = "";    // empty form after/before submitting
 
+    // Load all posts by default
+    load_posts();
+
     /** For JS on index page/all post page */
     document.querySelector('#create-form').onsubmit = function() {
 
@@ -20,6 +23,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // return false;
     }
-
-    
 })
+
+/** Function to load all posts on screen */
+function load_posts() {
+
+    fetch(`/posts`)
+    .then(response => response.json())
+    .then(posts => {
+        console.log(posts);
+    });
+
+}
