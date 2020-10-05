@@ -31,14 +31,12 @@ def create(request):
     user = get_user(request)
 
     # Fetch current user in db, and update the posts
-    # new_post = Post(user=user, text=post_text)
-    # user.posts.add(new_post)
 
-    #print(data)
-    #print(f"Current user: {get_user(request)}")
+    new_post = Post(user=user, text=post_text)
+    new_post.save()
+    user.posts.add(new_post)
 
-
-    return JsonResponse({"message": "Data sent"}, status=201)
+    return JsonResponse({"message": "Post added successfully."}, status=201)
 
 def login_view(request):
     if request.method == "POST":
