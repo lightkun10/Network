@@ -4,4 +4,12 @@
     border: 2px solid gray;
     border-radius: 5px;
     border-width: thin;
+    margin-bottom: 1.5em;
+}
+
+.post {
+    margin: 0.6em;
+    padding: 1em;
+    border: 2px solid gray;
+    border-radius: 5px;
 }
