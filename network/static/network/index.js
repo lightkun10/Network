@@ -49,6 +49,10 @@ function load_posts() {
             postUser.className = 'post-user';
             postUser.innerHTML = `<h4>${username}</h4>`
             p.append(postUser);
+            postUser.addEventListener('click', function() {
+                console.log("Change profile here...");
+                view_profile(username);
+            })
 
             let editButton = document.createElement('button');
             editButton.className = 'post-editBtn btn btn-info btn-sm';
@@ -86,10 +90,17 @@ function load_posts() {
 
             // Append username to the all post section
             document.querySelector('.all-post-section').append(p);
-
-
-            
         });
     });
 
+}
+
+function view_profile(username) {
+    fetch(`/${username}`)
+    .then(response => response.json())
+    .then(profile => {
+        console.log(profile);
+    });
+    
+    return false;
 }

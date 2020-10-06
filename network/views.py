@@ -47,6 +47,25 @@ def posts(request):
     posts = Post.objects.order_by("-created_at").all()
     return JsonResponse([post.serialize() for post in posts], safe=False)
 
+@login_required
+def user_profile(request, username):
+
+    # Query for requested profile
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "User not found."}, status=404)
+
+    # Return user profile
+    if request.method == "GET":
+        return JsonResponse(user.serialize(), safe=False)
+    
+    # Profile must be via GET or PUT
+    else:
+        return JsonResponse({
+            "error": "GET or PUT request required."
+        }, status=400)
+
 
 def login_view(request):
     if request.method == "POST":
