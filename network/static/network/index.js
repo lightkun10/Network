@@ -46,8 +46,14 @@ function load_posts() {
             p.className = `post post-${id}`
 
             const postUser = document.createElement('div');
+            //FIXME might be an url instead of an h4
             postUser.className = 'post-user';
-            postUser.innerHTML = `<h4>${username}</h4>`
+            let a = document.createElement('a');
+            a.appendChild(document.createTextNode(`${username}`));
+            // postUser.innerHTML = `<h4>${username}</h4>`
+            // postUser.innerHTML = `<a href="{% url 'profile' ${username} %}">${username}</a>`
+            a.href = `/${username}`;
+            postUser.appendChild(a);
             p.append(postUser);
             postUser.addEventListener('click', function() {
                 console.log("Change profile here...");
@@ -100,6 +106,10 @@ function view_profile(username) {
     .then(response => response.json())
     .then(profile => {
         console.log(profile);
+        // let username = profile["username"];
+        // let followersCount = profile["followers"];
+        // let followingsCount = profile["followings"];
+        // let posts = profile["posts"];
     });
     
     return false;

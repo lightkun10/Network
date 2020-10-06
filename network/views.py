@@ -58,9 +58,12 @@ def user_profile(request, username):
 
     # Return user profile
     if request.method == "GET":
-        return JsonResponse(user.serialize(), safe=False)
+        #return JsonResponse(user.serialize(), safe=False)
         print(user.serialize())
+        return render(request, "network/profile.html")
     
+    # FIXME Update to toggle follow/unfollow post
+
     # Profile must be via GET or PUT
     else:
         return JsonResponse({
