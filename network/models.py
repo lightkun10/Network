@@ -11,8 +11,8 @@ class User(AbstractUser):
         return {
             "username": self.username,
             "followers": self.followers.all().count(),
-            "followings": self.followings.all().count()
-            #"posts": self.posts.all()
+            "followings": self.followings.all().count(),
+            "posts": [post.text for post in self.posts.all()]
         }
 
 class Post(models.Model):

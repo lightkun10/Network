@@ -59,6 +59,7 @@ def user_profile(request, username):
     # Return user profile
     if request.method == "GET":
         return JsonResponse(user.serialize(), safe=False)
+        print(user.serialize())
     
     # Profile must be via GET or PUT
     else:
