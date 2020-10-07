@@ -12,7 +12,8 @@ class User(AbstractUser):
             "username": self.username,
             "followers": self.followers.all().count(),
             "followings": self.followings.all().count(),
-            "posts": [post.text for post in self.posts.all()]
+            "posts": [post.text for post in self.posts.order_by("-created_at").all()],
+            "following_user": [ following.user_follow.username for following in self.followings.all()]
         }
 
 class Post(models.Model):
