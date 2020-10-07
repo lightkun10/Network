@@ -6,5 +6,18 @@
 {% endblock %}
 
 {% block script %}
-    <script src="{% static 'network/index.js' %}"></script>
+    <!-- <script src="{% static 'network/profile.js' %}" type="text/javascript">
+    </script> -->
+    <script type="text/javascript">
+
+        let user = {{user | safe}};
+
+
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log(`${user["username"]} has ${user["followers"]} followers.`);
+
+        });
+
+    </script>
 {% endblock %}

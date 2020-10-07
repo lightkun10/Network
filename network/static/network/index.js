@@ -55,10 +55,10 @@ function load_posts() {
             a.href = `/${username}`;
             postUser.appendChild(a);
             p.append(postUser);
-            postUser.addEventListener('click', function() {
-                console.log("Change profile here...");
-                view_profile(username);
-            })
+            // postUser.addEventListener('click', function() {
+            //     console.log("Change profile here...");
+            //     view_profile(username);
+            // })
 
             let editButton = document.createElement('button');
             editButton.className = 'post-editBtn btn btn-info btn-sm';
@@ -101,16 +101,16 @@ function load_posts() {
 
 }
 
-function view_profile(username) {
-    fetch(`/${username}`)
-    .then(response => response.json())
-    .then(profile => {
-        console.log(profile);
-        // let username = profile["username"];
-        // let followersCount = profile["followers"];
-        // let followingsCount = profile["followings"];
-        // let posts = profile["posts"];
-    });
+// function view_profile(username) {
+//     fetch(`/${username}`)
+//     .then(response => response.json())
+//     .then(profile => {
+//         console.log(profile);
+//         // let username = profile["username"];
+//         // let followersCount = profile["followers"];
+//         // let followingsCount = profile["followings"];
+//         // let posts = profile["posts"];
+//     });
     
-    return false;
-}
+//     return false;
+// }

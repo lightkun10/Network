@@ -60,7 +60,9 @@ def user_profile(request, username):
     if request.method == "GET":
         #return JsonResponse(user.serialize(), safe=False)
         print(user.serialize())
-        return render(request, "network/profile.html")
+        # return render(request, "network/profile.html", {'user': user.serialize()})
+        json_user = json.dumps(user.serialize())
+        return render(request, "network/profile.html", {'user': json_user})
     
     # FIXME Update to toggle follow/unfollow post
 
