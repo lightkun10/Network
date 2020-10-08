@@ -47,6 +47,7 @@ def posts(request):
     return JsonResponse([post.serialize() for post in posts], safe=False)
 
 
+@csrf_exempt
 @login_required
 def user_profile(request, username):
 
@@ -88,6 +89,7 @@ def user_profile(request, username):
     # FIXME Update to toggle follow/unfollow post
     elif request.method == "POST":
         print("OK")
+        return JsonResponse({"message": "Server is listening."}, status=201)
 
     # Profile must be via GET or PUT
     else:

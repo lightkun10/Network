@@ -17,6 +17,18 @@ document.addEventListener('DOMContentLoaded', function() {
     fill_posts(username, posts);
 
     if (!isUserLoggedIn) fill_flwbtn(username);
+
+    const followBtn = document.querySelector('.followBtn');
+    followBtn.addEventListener('click', function() {
+        console.log('Button clicked');
+
+        fetch(`/${username}`, {method: 'POST'})
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+        })
+    });
+
 });
 
 function fill_posts(username, posts) {
@@ -68,6 +80,8 @@ function fill_flwbtn(username) {
     console.log("you can follow this user");
 
     let fb = document.createElement('button');
+    fb.innerHTML = 'Follow';
+    fb.className = 'followBtn btn btn-outline-primary';
 
     document.querySelector('.followBtn-section').append(fb);
 }
