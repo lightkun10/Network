@@ -81,9 +81,25 @@ def user_profile(request, username):
     
     # Toggle follow/unfollow post
     elif request.method == "POST":
+        # Get response data after button clicked from js
         data = json.loads(request.body)
-        print(data)
-        return JsonResponse({"message": "Server is listening."}, status=201)
+        update_follow = data.get("update_follow_status")
+                
+        # If user want to follow current account...
+        if update_follow == "follow":
+            print("You want to follow this account")
+            try:
+                # Add new followings
+                newf = Follow(user=cur_user, user_follow=user)
+                newf.save()
+                return JsonResponse({"message": "You follow this account."}, status=201)
+            except:
+                return JsonResponse({"message": "Something's wrong happened..."}, status=400)
+        # If user want to unfollow current account...
+        elif update_follow == "unfollow":
+            print("You want to unfollow this account")
+            return JsonResponse({"message": "You want to unfollow this account."}, status=201)
+        # return JsonResponse({"message": "Server is listening."}, status=201)
 
     # Profile must be via GET or PUT
     else:

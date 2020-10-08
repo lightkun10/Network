@@ -22,12 +22,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const followBtn = document.querySelector('.followBtn');
         followBtn.addEventListener('click', function() {
             console.log('Button clicked');
+
+            let update = !isFollowing
     
             fetch(`/${username}`, {
                 method: 'POST',
                 body: JSON.stringify({
                     username: username,
-                    update_follow_status: !isFollowing
+                    update_follow_status: update === false ? "unfollow" : "follow"
                 })
             })
             .then(response => response.json())
