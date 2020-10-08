@@ -7,6 +7,15 @@ from django.db import models
 class User(AbstractUser):
     pass
 
+    def serialize(self):
+        return {
+            "username": self.username,
+            "followers": self.followers.all().count(),
+            "followings": self.followings.all().count(),
+            "posts": [post.text for post in self.posts.order_by("-created_at").all()],
+            "following_user": [ following.user_follow.username for following in self.followings.all()]
+        }
+
 class Post(models.Model):
     user = models.ForeignKey(User, related_name="posts", on_delete=models.CASCADE)
     text = models.CharField(max_length=300)

@@ -46,9 +46,19 @@ function load_posts() {
             p.className = `post post-${id}`
 
             const postUser = document.createElement('div');
+            //FIXME might be an url instead of an h4
             postUser.className = 'post-user';
-            postUser.innerHTML = `<h4>${username}</h4>`
+            let a = document.createElement('a');
+            a.appendChild(document.createTextNode(`${username}`));
+            // postUser.innerHTML = `<h4>${username}</h4>`
+            // postUser.innerHTML = `<a href="{% url 'profile' ${username} %}">${username}</a>`
+            a.href = `/${username}`;
+            postUser.appendChild(a);
             p.append(postUser);
+            // postUser.addEventListener('click', function() {
+            //     console.log("Change profile here...");
+            //     view_profile(username);
+            // })
 
             let editButton = document.createElement('button');
             editButton.className = 'post-editBtn btn btn-info btn-sm';
@@ -86,9 +96,6 @@ function load_posts() {
 
             // Append username to the all post section
             document.querySelector('.all-post-section').append(p);
-
-
-            
         });
     });
 

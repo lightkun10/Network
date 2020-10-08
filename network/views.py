@@ -32,7 +32,6 @@ def create(request):
     user = get_user(request)
 
     # Fetch current user in db, and update the posts
-
     new_post = Post(user=user, text=post_text)
     new_post.save()
     user.posts.add(new_post)
@@ -46,6 +45,55 @@ def posts(request):
     # Display all available posts
     posts = Post.objects.order_by("-created_at").all()
     return JsonResponse([post.serialize() for post in posts], safe=False)
+
+
+@login_required
+def user_profile(request, username):
+
+    # Query for requested profile
+    try:
+        user = User.objects.get(username=username)
+        #print(get_user(request).username == user.username)
+        is_user = get_user(request).username == user.username
+    except User.DoesNotExist:
+        return JsonResponse({"error": "User not found."}, status=404)
+
+    # Return user profile
+    if request.method == "GET":
+
+        # Check if profile clicked is already followed
+        cur_user = get_user(request)
+        # print(cur_user.followings.get(user_follow=user))
+
+        try:
+            if cur_user.followings.get(user_follow=user):
+                is_following = True
+        except:
+            is_following = False
+            pass
+
+        # followings = user.serialize()['following_user']
+        # print(followings)
+
+        # return render(request, "network/profile.html", {'user': user.serialize()})
+
+        json_user = json.dumps(user.serialize())
+        #print(user.serialize()['following_user'])
+        return render(request, "network/profile.html", {
+            'user': json_user,
+            'is_user': str(is_user).lower(),
+            'is_following': str(is_following).lower()
+        })
+    
+    # FIXME Update to toggle follow/unfollow post
+    elif request.method == "POST":
+        print("OK")
+
+    # Profile must be via GET or PUT
+    else:
+        return JsonResponse({
+            "error": "GET or PUT request required."
+        }, status=400)
 
 
 def login_view(request):

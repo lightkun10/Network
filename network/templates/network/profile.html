@@ -1,0 +1,53 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block body %}
+    
+    <div class="util-section">
+        <div class="followBtn-section">
+            <!-- <button class="followBtn"></button> -->
+        </div>
+    </div>
+    
+    <!-- Username & follow display -->
+    <div class="username-section"></div>
+
+    <!-- Follow info section -->
+    <div class="follow-section">
+        <div class="followers-section">
+            <a class="followers-link" href="#">
+                <span class="followers-num"></span>
+                <span class="followers-str"></span>
+            </a>
+        </div>
+    
+        <div class="followings-section">
+            <a class="followings-link" href="#">
+                <span class="followings-num"></span>
+                <span class="followings-str"></span>
+            </a>
+        </div>
+    </div>
+
+    <!-- All posts section -->
+    <div class="posts-section">
+        <!-- Maybe for profile picture, for further update? -->
+        <!-- <div></div> -->
+
+        <!-- For actual post section -->
+        <!-- <div class="post-section">
+            <div class="profile-info"></div>
+            <div class="post-content">LET'S GOOO</div>
+        </div> -->
+    </div>
+
+{% endblock %}
+
+{% block script %}
+
+    {{ user|json_script:"user" }}
+    {{ is_user|json_script:"is_user" }}
+    {{ is_following|json_script:"is_following" }}
+    <script src="{% static 'network/profile.js' %}"></script>
+
+{% endblock %}
