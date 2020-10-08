@@ -100,17 +100,3 @@ function load_posts() {
     });
 
 }
-
-// function view_profile(username) {
-//     fetch(`/${username}`)
-//     .then(response => response.json())
-//     .then(profile => {
-//         console.log(profile);
-//         // let username = profile["username"];
-//         // let followersCount = profile["followers"];
-//         // let followingsCount = profile["followings"];
-//         // let posts = profile["posts"];
-//     });
-    
-//     return false;
-// }
