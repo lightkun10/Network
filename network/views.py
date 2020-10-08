@@ -59,36 +59,30 @@ def user_profile(request, username):
     except User.DoesNotExist:
         return JsonResponse({"error": "User not found."}, status=404)
 
-    # Return user profile
-    if request.method == "GET":
+    cur_user = get_user(request)
 
-        # Check if profile clicked is already followed
-        cur_user = get_user(request)
-        # print(cur_user.followings.get(user_follow=user))
-
-        try:
-            if cur_user.followings.get(user_follow=user):
-                is_following = True
-        except:
+    try:
+        if cur_user.followings.get(user_follow=user):
+            is_following = True
+    except:
             is_following = False
             pass
 
-        # followings = user.serialize()['following_user']
-        # print(followings)
-
-        # return render(request, "network/profile.html", {'user': user.serialize()})
+    # Return user profile
+    if request.method == "GET":
 
         json_user = json.dumps(user.serialize())
-        #print(user.serialize()['following_user'])
+
         return render(request, "network/profile.html", {
             'user': json_user,
             'is_user': str(is_user).lower(),
             'is_following': str(is_following).lower()
         })
     
-    # FIXME Update to toggle follow/unfollow post
+    # Toggle follow/unfollow post
     elif request.method == "POST":
-        print("OK")
+        data = json.loads(request.body)
+        print(data)
         return JsonResponse({"message": "Server is listening."}, status=201)
 
     # Profile must be via GET or PUT

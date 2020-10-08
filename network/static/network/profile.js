@@ -18,16 +18,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (!isUserLoggedIn) fill_flwbtn(username);
 
-    const followBtn = document.querySelector('.followBtn');
-    followBtn.addEventListener('click', function() {
-        console.log('Button clicked');
-
-        fetch(`/${username}`, {method: 'POST'})
-        .then(response => response.json())
-        .then(result => {
-            console.log(result);
-        })
-    });
+    if (!isUserLoggedIn) {
+        const followBtn = document.querySelector('.followBtn');
+        followBtn.addEventListener('click', function() {
+            console.log('Button clicked');
+    
+            fetch(`/${username}`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    username: username,
+                    update_follow_status: !isFollowing
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log(result);
+            })
+        });
+    }
 
 });
 
