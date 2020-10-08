@@ -60,8 +60,6 @@ def user_profile(request, username):
 
     # Return user profile
     if request.method == "GET":
-        #return JsonResponse(user.serialize(), safe=False)
-        #print(user.serialize())
 
         # Check if profile clicked is already followed
         cur_user = get_user(request)
@@ -88,6 +86,8 @@ def user_profile(request, username):
         })
     
     # FIXME Update to toggle follow/unfollow post
+    elif request.method == "POST":
+        print("OK")
 
     # Profile must be via GET or PUT
     else:

@@ -16,13 +16,10 @@ document.addEventListener('DOMContentLoaded', function() {
     fill_followings(username, followings);
     fill_posts(username, posts);
 
-    if (!isUserLoggedIn) fill_flwbtn();
+    if (!isUserLoggedIn) fill_flwbtn(username);
 });
 
 function fill_posts(username, posts) {
-    
-    // let postSection = document.createElement('div');
-    // postSection.className = 'post-section';
     
     posts.forEach(post => {
 
@@ -42,8 +39,6 @@ function fill_posts(username, posts) {
 
         document.querySelector('.posts-section').append(postSection);
     });
-
-    // document.querySelector('.posts-section').append(postSection);
 }
 
 
@@ -69,12 +64,10 @@ function fill_followings(username, followings) {
     fs.innerHTML = fs > 1 ? `Followings` : `Following`;
 }
 
-function fill_flwbtn() {
+function fill_flwbtn(username) {
     console.log("you can follow this user");
 
     let fb = document.createElement('button');
-    fb.className = 'followBtn btn btn-outline-primary';
-    fb.innerHTML = 'Follow'
 
     document.querySelector('.followBtn-section').append(fb);
 }
