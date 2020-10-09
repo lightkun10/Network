@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import *
 
 def index(request):
-    # Authenticated users view their inbox
+    # Authenticated users
     if request.user.is_authenticated:
         return render(request, "network/index.html")
 
@@ -54,7 +54,6 @@ def user_profile(request, username):
     # Query for requested profile
     try:
         user = User.objects.get(username=username)
-        #print(get_user(request).username == user.username)
         is_user = get_user(request).username == user.username
     except User.DoesNotExist:
         return JsonResponse({"error": "User not found."}, status=404)
@@ -70,11 +69,11 @@ def user_profile(request, username):
 
     # Return user profile
     if request.method == "GET":
-
         json_user = json.dumps(user.serialize())
 
         return render(request, "network/profile.html", {
-            'user': json_user,
+            'user': cur_user,
+            'select_user': json_user,
             'is_user': str(is_user).lower(),
             'is_following': str(is_following).lower()
         })
@@ -85,20 +84,22 @@ def user_profile(request, username):
         data = json.loads(request.body)
         update_follow = data.get("update_follow_status")
                 
-        # If user want to follow current account...
+        # Follow user
         if update_follow == "follow":
             print("You want to follow this account")
             try:
-                # Add new followings
                 newf = Follow(user=cur_user, user_follow=user)
                 newf.save()
                 return JsonResponse({"message": "You follow this account."}, status=201)
             except:
-                return JsonResponse({"message": "Something's wrong happened..."}, status=400)
-        # If user want to unfollow current account...
+                return JsonResponse({"message": "Failed following the account. Try again."}, status=400)
+        # Unfollow user
         elif update_follow == "unfollow":
-            print("You want to unfollow this account")
-            return JsonResponse({"message": "You want to unfollow this account."}, status=201)
+            try:
+                cur_user.followings.get(user_follow=user).delete()
+                return JsonResponse({"message": "Successfully unfollow the account."}, status=201)
+            except:
+                return JsonResponse({"message": "Failed following the account. Try again."}, status=400)
         # return JsonResponse({"message": "Server is listening."}, status=201)
 
     # Profile must be via GET or PUT

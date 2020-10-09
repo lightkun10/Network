@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     
     let isUserLoggedIn = JSON.parse(JSON.parse(is_user.text))
-    user = JSON.parse(JSON.parse(user.text));
+    user = JSON.parse(JSON.parse(select_user.text));
     isFollowing = JSON.parse(JSON.parse(is_following.text));
     isFollowing ? console.log(`You are following this acc`) : console.log("You aren't following this acc");
 
@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(result => {
                 console.log(result);
+                location.reload(); // refresh the current page
             })
         });
     }
@@ -88,10 +89,15 @@ function fill_followings(username, followings) {
 
 function fill_flwbtn(username) {
     console.log("you can follow this user");
+    isFollowing ? console.log("But you already follow this user, though...") : "";
 
-    let fb = document.createElement('button');
-    fb.innerHTML = 'Follow';
-    fb.className = 'followBtn btn btn-outline-primary';
+    
+    fb = document.createElement('button');
+    fb.innerHTML = isFollowing ? 'Unfollow' : 'Follow';
+    fb.className = isFollowing ? 'followBtn btn btn-primary' : 'followBtn btn btn-outline-primary'
+
+    // fb.innerHTML = 'Follow';
+    // fb.className = 'followBtn btn btn-outline-primary';
 
     document.querySelector('.followBtn-section').append(fb);
 }

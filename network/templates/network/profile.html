@@ -45,7 +45,7 @@
 
 {% block script %}
 
-    {{ user|json_script:"user" }}
+    {{ select_user|json_script:"select_user" }}
     {{ is_user|json_script:"is_user" }}
     {{ is_following|json_script:"is_following" }}
     <script src="{% static 'network/profile.js' %}"></script>
