@@ -5,14 +5,33 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import HttpResponse, HttpResponseRedirect, render
 from django.urls import reverse
+from django.views.generic import ListView
 from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator
 
 from .models import *
 
 def index(request):
     # Authenticated users
     if request.user.is_authenticated:
-        return render(request, "network/index.html")
+
+        # Display all available posts
+        posts = Post.objects.order_by("-created_at").all()
+
+        json_posts = json.dumps([post.serialize() for post in posts])
+
+        paginator = Paginator(posts, 5) # Show 5 contacts per page.
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        # return JsonResponse([post.serialize() for post in posts], safe=False)
+
+        print(type(page_obj))
+
+        return render(request, "network/index.html", {
+            'posts': json_posts,
+            'page_obj': page_obj
+        })
 
     # Unsigned user is prompted to sign in
     else:
@@ -37,14 +56,6 @@ def create(request):
     user.posts.add(new_post)
 
     return JsonResponse({"message": "Post added successfully."}, status=201)
-
-
-@login_required
-def posts(request):
-
-    # Display all available posts
-    posts = Post.objects.order_by("-created_at").all()
-    return JsonResponse([post.serialize() for post in posts], safe=False)
 
 
 @csrf_exempt
@@ -197,3 +208,10 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+
+
+class PostList(ListView):
+    paginate_by = 5
+    model = Post
+    template_name = 'network/index.html'
+    context_object_name = 'posts'
