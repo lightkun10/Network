@@ -109,6 +109,44 @@ def user_profile(request, username):
         }, status=400)
 
 
+@login_required
+# View for current user's following posts
+def following_view(request, username):
+
+    # print(username)
+
+    return render(request, "network/following.html", {'username': username})
+    # return HttpResponse("OK")
+
+
+@login_required
+def following_get(request, username):
+
+    print(username)
+    # Query for requested profile
+    try:
+        user = User.objects.get(username=username)
+        is_user = get_user(request).username == user.username
+    except User.DoesNotExist:
+        return JsonResponse({"error": "User not found."}, status=404)
+
+    # Get all followings as 'User' Object in a List
+    followings = [following.user_follow for following in user.followings.all()]
+
+    posts = Post.objects.order_by("-created_at").all()
+
+    following_posts = []
+
+    # NOTE: Using linear search. I think it need faster searching algo here...
+    for following in followings:
+        for post in posts:
+            if post.user == following:
+                following_posts.append(post)
+    
+    # print(following_posts)
+    return JsonResponse([post.serialize() for post in following_posts], safe=False)
+
+
 def login_view(request):
     if request.method == "POST":
 

@@ -1,0 +1,25 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block body %}
+<div class="followings-post-section">
+    <!--<div class="post post-1">
+            <div class="post-user"></div>
+            <div class="post-editbtn"></div>
+            <div class="post-content"></div>
+            <div class="post-time"></div>
+            <div class="post-likes">
+                <img src="---">
+            </div>
+            <div class="post-comment"></div>
+        </div>
+     -->
+</div>
+{% endblock %}
+
+{% block script %}
+
+    {{ username|json_script:"username" }}
+    <script src="{% static 'network/following.js' %}"></script>
+
+{% endblock %}
