@@ -5,12 +5,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     newPost();
 
-})
 
+})
 
 function newPost() {
 
-    /** For JS on index page/all post page */
     document.querySelector('#create-form').onsubmit = function() {
 
         fetch('/post', {

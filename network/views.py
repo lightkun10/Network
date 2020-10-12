@@ -25,10 +25,15 @@ def index(request):
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
 
+        # Get current user
+        cur_user = get_user(request)
+        # filter 
+
         # return JsonResponse([post.serialize() for post in posts], safe=False)
         return render(request, "network/index.html", {
             'posts': json_posts,
-            'page_obj': page_obj
+            'page_obj': page_obj,
+            'current_user': cur_user
         })
 
     # Unsigned user is prompted to sign in
@@ -154,6 +159,13 @@ def following_get(request, username):
     
     # print(following_posts)
     return JsonResponse([post.serialize() for post in following_posts], safe=False)
+
+
+# Display a single post 
+def single_post(request, username, post_id):
+    post = Post.objects.get(pk=post_id)
+    print(post)
+    return HttpResponse("OK")
 
 
 def login_view(request):
