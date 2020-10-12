@@ -20,14 +20,12 @@ def index(request):
 
         json_posts = json.dumps([post.serialize() for post in posts])
 
-        paginator = Paginator(posts, 5) # Show 5 contacts per page.
+        paginator = Paginator(posts, 10) # Show 10 contacts per page.
+        # paginator = Paginator(posts, 5) # Show 5 contacts per page.
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
 
         # return JsonResponse([post.serialize() for post in posts], safe=False)
-
-        print(type(page_obj))
-
         return render(request, "network/index.html", {
             'posts': json_posts,
             'page_obj': page_obj
@@ -133,7 +131,7 @@ def following_view(request, username):
 @login_required
 def following_get(request, username):
 
-    print(username)
+    #print(username)
     # Query for requested profile
     try:
         user = User.objects.get(username=username)
