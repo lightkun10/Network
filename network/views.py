@@ -6,7 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import HttpResponse, HttpResponseRedirect, render
 from django.urls import reverse
 from django.views.generic import ListView
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.core.paginator import Paginator
 
 from .models import *
@@ -50,6 +50,7 @@ def create(request):
     
     # Check text of post and user that sent it
     data = json.loads(request.body)
+    print(data)
     post_text = data["text"]
     user = get_user(request)
 
@@ -161,11 +162,31 @@ def following_get(request, username):
     return JsonResponse([post.serialize() for post in following_posts], safe=False)
 
 
-# Display a single post 
+@csrf_exempt
+@login_required
+# Display a single post or edit them
 def single_post(request, username, post_id):
-    post = Post.objects.get(pk=post_id)
-    print(post)
-    return HttpResponse("OK")
+
+    # If user put a request to edit a post 
+    if request.method == "PUT":
+        data = json.loads(request.body)
+        # print(post_id)
+        # print(data["text"])
+        cur_post = Post.objects.get(pk=post_id)
+        cur_post.text = data["text"]
+        cur_post.save()
+        updated_post = cur_post.text
+
+        return JsonResponse({"message": "Post edited successfully."}, status=201)
+
+    else:
+        user = get_user(request)
+        post = Post.objects.get(pk=post_id)
+        #print(f"'{post.text}' by {post.user}")
+        return render(request, "network/editpost.html", {
+            'user': user,
+            'post': post
+        })
 
 
 def login_view(request):

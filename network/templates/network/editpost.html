@@ -1,0 +1,22 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block body %}
+    <div class="edit-post-section">
+        <form id="edit-form" method="put">
+            {% csrf_token %}
+
+            <!-- for the 300 char limit -->
+            <textarea class="textarea resize-ta" name="edit-text" id="post-text" 
+                rows="4" cols="100">{{ post.text }}</textarea> <br>
+            <input value="Edit" type="submit" class="btn btn-primary">
+        </form>
+    </div>
+{% endblock %}
+
+{% block script %}
+
+    <script type="text/javascript">
+    </script>
+
+{% endblock %}

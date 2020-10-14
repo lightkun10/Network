@@ -33,20 +33,26 @@
     </div> -->
 
     {% for post in page_obj %}
-        <a href="{% url 'post' post.user post.id %}">
-            <div class="postItem">
+        <a href="{% url 'post' post.user post.id %}"></a>
+            <div data-id="{{ post.id }}" class="postItem">
                 <div class="post-user">
-                    <a href="{% url 'profile' post.id %}">{{ post.user }}</a>
+                    <a href="{% url 'profile' post.user %}">{{ post.user }}</a>
                 </div>
         
                 {% if post.user == current_user %}
                     <div class="post-edit">
-                        <button onclick="editPost(`{{post.id}}`, `{{ post.user }}`);" class="post-editBtn btn btn-info btn-sm">Edit</button>
+                        <form onsubmit="event.preventDefault()" id="edit-form">
+                            {% csrf_token %}
+                            <button onclick="editPost(`{{post.id}}`, `{{ post.user }}`);" class="post-editBtn btn btn-info btn-sm">Edit</button>
+                            <textarea style="display: none;" class="textarea resize-ta" id="edit-text" name="edit-text" rows="4" cols="100">{{ post.text }}</textarea>
+                        </form>
                     </div>
                 {% endif %}
 
                 <div class="post-content">
-                    {{ post.text }}
+                    <div class="post-text">
+                        {{ post.text }}
+                    </div>
                 </div>
                 <div class="post-time">
                     {{ post.created_at }}
@@ -56,6 +62,11 @@
                     <img class="likes-logo">
                 </div>
             </div>
+            <!-- 
+                <div class="editPost">
+
+                </div>
+             -->
         </a>
     {% endfor %}
     
@@ -105,7 +116,10 @@
 
     <script type="text/javascript">
 
+
         document.addEventListener('DOMContentLoaded', function() {
+            
+            // Load post each time on page
 
             document.querySelector('#post-text').value = "";    // empty form after/before submitting
             newPost();
@@ -129,14 +143,61 @@
                     location.reload();
                 });
 
-                // return false;
+                return false;
             }
         }
 
         function editPost(post_id, post_user) {
 
             console.log("You clicked the edit button");
-            console.log("Post id: " + post_id + " by " + post_user);
+
+            const posts = document.querySelectorAll('.postItem');
+            posts.forEach(post => {
+
+                if (post.dataset.id === post_id) {
+
+                    post.querySelector('#edit-text').style.display = "block";
+                    
+                    // post.querySelector('#edit-text').style.display = "block";
+
+                    let originalPost = post.querySelector('.post-text').innerText;
+                    // const editButton = post.querySelector('.')
+
+                    // Change the class of button
+                    let editButton = post.querySelector('.post-editBtn');
+
+                    // Empty the original post text
+                    post.querySelector('.post-text').innerText = '';
+
+                    // Insert form to edit post on post edit section
+                    let editForm = post.querySelector('#edit-form');
+
+                    editButton.addEventListener('click', function() {
+
+                        console.log("OK");
+
+                        const editPostContent = post.querySelector('#edit-text').value;
+
+                        // Make a put request to the db
+                        fetch(`/${post_user}/post/${post_id}`, {
+                            method: 'PUT',
+                            body: JSON.stringify({
+                                text: editPostContent
+                            })
+                        })
+                        
+                        post.querySelector('.post-text').innerText = editPostContent;
+
+                        if (post.querySelector('#edit-text').style.display === 'none') {
+                            post.querySelector('#edit-text').style.display = "block";
+                        } else if (post.querySelector('#edit-text').style.display === 'block') {
+                            post.querySelector('#edit-text').style.display = "none";
+                        }
+
+                        return false;
+                    })
+                }
+            })
 
         }
 
