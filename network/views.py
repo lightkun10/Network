@@ -18,8 +18,6 @@ def index(request):
         # Display all available posts
         posts = Post.objects.order_by("-created_at").all()
 
-        json_posts = json.dumps([post.serialize() for post in posts])
-
         paginator = Paginator(posts, 10) # Show 10 contacts per page.
         # paginator = Paginator(posts, 5) # Show 5 contacts per page.
         page_number = request.GET.get('page')
@@ -27,13 +25,19 @@ def index(request):
 
         # Get current user
         cur_user = get_user(request)
-        # filter 
+        post_likes = cur_user.likes.all()
+
+        # json_posts = json.dumps(posts.serialize())
+        json_cur_user = json.dumps(cur_user.serialize())
 
         # return JsonResponse([post.serialize() for post in posts], safe=False)
         return render(request, "network/index.html", {
-            'posts': json_posts,
+            # 'json_posts': json_posts,
+            'json_cur_user': json_cur_user,
             'page_obj': page_obj,
-            'current_user': cur_user
+            'current_user': cur_user,
+            'post_likes': post_likes,
+            'posts': posts
         })
 
     # Unsigned user is prompted to sign in
@@ -179,16 +183,65 @@ def single_post(request, username, post_id):
 
         return JsonResponse({"message": "Post edited successfully."}, status=201)
 
+    # GET
     else:
         user = get_user(request)
         post = Post.objects.get(pk=post_id)
-        #print(f"'{post.text}' by {post.user}")
         return render(request, "network/editpost.html", {
             'user': user,
             'post': post
         })
 
 
+@csrf_exempt
+@login_required
+def addlikes(request, username, post_id):
+
+    # POST
+    if request.method == "POST":
+
+        liked_post = Post.objects.get(pk=post_id) # a Post object
+
+        try:
+            new_like = Like(user=liked_post.user, post=liked_post)
+            new_like.save()
+            get_user(request).likes.add(new_like)
+            return JsonResponse({"message": "You liked this post.", "status": "success"}, status=201)
+        except:
+            return JsonResponse({"message": "Failed like the post. Try again.", "status": "fail"}, status=400)
+
+    elif request.method == "GET":
+
+        # Check if logged in user is liking the post 
+        user_likes = get_user(request).likes.all()
+
+        try:
+            if get_user(request).likes.get(post=post_id):
+                add_like = True
+        except:
+                add_like = False
+                pass
+        
+        return JsonResponse({'add_like': str(add_like).lower()}, status=200)
+
+
+@csrf_exempt
+@login_required
+def dislikes(request, username, post_id):
+
+    # POST
+    if request.method == "POST":
+
+        disliked_post = Post.objects.get(pk=post_id) # a Post object
+        # return JsonResponse({"message": "Dislike post...", "status": "success"}, status=201)
+
+        try:
+            get_user(request).likes.get(post=disliked_post).delete()
+            return JsonResponse({"message": "You liked this post.", "status": "success"}, status=201)
+        except:
+            return JsonResponse({"message": "Failed like the post. Try again.", "status": "fail"}, status=400)
+
+   
 def login_view(request):
     if request.method == "POST":
 

@@ -41,7 +41,7 @@ class Like(models.Model):
 
     # Returns string representation of a particular object
     def __str__(self):
-        return f"{self.user} likes post #{self.id} at {self.liked_at}"
+        return f"{self.user} likes post {self.post} at {self.liked_at}"
 
 
 class Follow(models.Model):

@@ -34,7 +34,7 @@
 
     {% for post in page_obj %}
         <a href="{% url 'post' post.user post.id %}"></a>
-            <div data-id="{{ post.id }}" class="postItem">
+            <div data-id="{{ post.id }}" data-user="{{ post.user }}" class="postItem">
                 <div class="post-user">
                     <a href="{% url 'profile' post.user %}">{{ post.user }}</a>
                 </div>
@@ -58,9 +58,19 @@
                     {{ post.created_at }}
                 </div>
                 
+                <!-- <div class="post-likes">
+                    {% for liked in post.likers.all %}
+                        {% if liked.user == current_user %}
+                                <img src="/static/images/like.png" onclick="unLike(`{{post.id}}`, `{{ post.user }}`)" class="likes-logo">
+                        {% endif %}
+                    {% endfor %}
+                </div> -->
+
                 <div class="post-likes">
-                    <img class="likes-logo">
+                    <!-- <img src="/static/images/like.png" onclick="unLike(`{{post.id}}`, `{{ post.user }}`)" class="likes-logo"> -->
                 </div>
+
+
             </div>
             <!-- 
                 <div class="editPost">
@@ -98,7 +108,9 @@
 
             {% if page_obj.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj_next_page_number }}">Next</a>
+                    <span class="page-link">
+                        <a href="?page={{ page_obj_next_page_number }}">Next</a>
+                    </span>
                 </li>
             {% else %}
                 <li class="page-item disabled">
@@ -114,16 +126,113 @@
 {% block script %}
     <!-- <script src="{% static 'network/index.js' %}"></script> -->
 
+    {{ json_posts|json_script:"json_posts" }}
+    {{ json_cur_user|json_script:"json_cur_user" }}
     <script type="text/javascript">
 
-
+        const curLoginUser = JSON.parse(JSON.parse(json_cur_user.text));
+    
         document.addEventListener('DOMContentLoaded', function() {
             
             // Load post each time on page
 
             document.querySelector('#post-text').value = "";    // empty form after/before submitting
+            fillLikes();
             newPost();
         })
+
+
+        function fillLikes() {
+
+            const postLikes = document.querySelectorAll('.post-likes');
+
+            postLikes.forEach(post => {
+
+                fetch(`/${post.parentElement.dataset.user}/post/${post.parentElement.dataset.id}/addlikes`)
+                .then(response => response.json())
+                .then(ps => {
+
+                    let likeImg = document.createElement('img');
+                    likeImg.className = 'likes-logo';
+                    likeImg.src = "/static/images/like.png";
+                    likeImg.setAttribute('width', 20);
+                    likeImg.setAttribute('heigth', 97);
+
+                    let dislikeImg = document.createElement('img');
+                    dislikeImg.className = 'unlikes-logo';
+                    dislikeImg.src = "/static/images/unlike.png";
+                    dislikeImg.setAttribute('width', 20);
+                    dislikeImg.setAttribute('heigth', 97);
+                    
+                    if (ps["add_like"] === 'true') {
+
+                        post.append(likeImg);
+                        // console.log(p.contains(likeImg))
+                        likeImg.addEventListener('click', function() {
+                            unLike(post.parentElement.dataset.id, post.parentElement.dataset.user);
+                            likeImg.replaceWith(dislikeImg);
+                        })
+                    } else {
+                        
+                        post.append(dislikeImg);
+                        // console.log(p.contains(dislikeImg))
+                        dislikeImg.addEventListener('click', function() {
+                            addLike(post.parentElement.dataset.id, post.parentElement.dataset.user);
+                            dislikeImg.replaceWith(likeImg);
+                        });
+                    }
+
+                })
+
+                // Check element of current post
+                console.log(post.childNodes);
+            });
+
+        }
+
+        function addLike(post_id, post_user) {
+            
+            // Fetch the db for the post that going to be liked
+            fetch(`/${post_user}/post/${post_id}/addlikes`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    post_author: post_user,
+                    post_id: post_id
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                
+                if (result["status"] === 'success') {
+                    // document.querySelectorAll('[data-id]').className = 'likes-logo';
+                    return 0;
+                }
+
+            });
+
+        }
+
+        function unLike(post_id, post_user) {
+
+            // Fetch the db for the post that going to be liked
+            fetch(`/${post_user}/post/${post_id}/dislikes`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    post_author: post_user,
+                    post_id: post_id
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                
+                if (result["status"] === 'success') {
+                    // document.querySelectorAll('[data-id]').className = 'likes-logo';
+                    return 0;
+                }
+
+            });
+
+        }
 
         function newPost() {
 
@@ -158,10 +267,7 @@
 
                     post.querySelector('#edit-text').style.display = "block";
                     
-                    // post.querySelector('#edit-text').style.display = "block";
-
                     let originalPost = post.querySelector('.post-text').innerText;
-                    // const editButton = post.querySelector('.')
 
                     // Change the class of button
                     let editButton = post.querySelector('.post-editBtn');
