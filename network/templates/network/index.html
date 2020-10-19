@@ -67,7 +67,7 @@
                 </div> -->
 
                 <div class="post-likes">
-                    <!-- <img src="/static/images/like.png" onclick="unLike(`{{post.id}}`, `{{ post.user }}`)" class="likes-logo"> -->
+                    <img class="likes-logo" alt="likeLogo">
                 </div>
 
 
@@ -152,40 +152,42 @@
                 .then(response => response.json())
                 .then(ps => {
 
-                    let likeImg = document.createElement('img');
-                    likeImg.className = 'likes-logo';
-                    likeImg.src = "/static/images/like.png";
+                    // let likeImg = document.createElement('img');
+                    let likeImg = post.querySelector('.likes-logo');
+                    // likeImg.className = 'likes-logo';
+                    // likeImg.src = "/static/images/like.png";
                     likeImg.setAttribute('width', 20);
                     likeImg.setAttribute('heigth', 97);
 
-                    let dislikeImg = document.createElement('img');
-                    dislikeImg.className = 'unlikes-logo';
-                    dislikeImg.src = "/static/images/unlike.png";
-                    dislikeImg.setAttribute('width', 20);
-                    dislikeImg.setAttribute('heigth', 97);
+                    console.log(ps)
                     
                     if (ps["add_like"] === 'true') {
+                        // likeImg.className = 'likes-logo';
+                        likeImg.src = "/static/images/like.png";
 
-                        post.append(likeImg);
+                        // post.append(likeImg);
                         // console.log(p.contains(likeImg))
                         likeImg.addEventListener('click', function() {
+                            likeImg.src = "/static/images/unlike.png";
                             unLike(post.parentElement.dataset.id, post.parentElement.dataset.user);
-                            likeImg.replaceWith(dislikeImg);
+                            // return false;
                         })
-                    } else {
-                        
-                        post.append(dislikeImg);
+                    } else if (ps["add_like"] === 'false') {
+                        // likeImg.className = 'unlikes-logo';
+                        likeImg.src = "/static/images/unlike.png";
+
+                        // post.append(likeImg);
                         // console.log(p.contains(dislikeImg))
-                        dislikeImg.addEventListener('click', function() {
+                        likeImg.addEventListener('click', function() {
+                            likeImg.src = '/static/images/like.png';
                             addLike(post.parentElement.dataset.id, post.parentElement.dataset.user);
-                            dislikeImg.replaceWith(likeImg);
+                            // return false;
                         });
                     }
 
+                    // Check element of current post
+                    // console.log(post.children[0].className);
                 })
-
-                // Check element of current post
-                console.log(post.childNodes);
             });
 
         }
@@ -205,7 +207,7 @@
                 
                 if (result["status"] === 'success') {
                     // document.querySelectorAll('[data-id]').className = 'likes-logo';
-                    return 0;
+                    window.history.replaceState( "http://127.0.0.1:8000/" , "", "http://127.0.0.1:8000/" );
                 }
 
             });
@@ -227,7 +229,7 @@
                 
                 if (result["status"] === 'success') {
                     // document.querySelectorAll('[data-id]').className = 'likes-logo';
-                    return 0;
+                    window.history.replaceState( "http://127.0.0.1:8000/" , "", "http://127.0.0.1:8000/" );
                 }
 
             });
