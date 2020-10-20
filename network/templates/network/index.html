@@ -144,24 +144,9 @@
                     likeImg.setAttribute('width', 20);
                     likeImg.setAttribute('heigth', 97);
 
-                    console.log(ps)
+                    showLikesCount(post);
                     
-                    if (ps["add_like"] === 'true') {
-                        // likeImg.className = 'likes-logo';
-                        likeImg.src = "/static/images/like.png";
-                        likeImg.addEventListener('click', function() {
-                            unLike(post);
-
-                        })
-                    } else if (ps["add_like"] === 'false') {
-                        // likeImg.className = 'unlikes-logo';
-                        likeImg.src = "/static/images/unlike.png";
-                        likeImg.addEventListener('click', function() {
-                            addLike(post);
-                        });
-                    }
-                    // Check element of current post
-                    // console.log(post.children[0].className);
+                    likeImg.src = ps["add_like"] === 'true' ? "/static/images/like.png" : "/static/images/unlike.png";
                 })
         }
     
@@ -171,16 +156,31 @@
             
             const postLikes = document.querySelectorAll('.post-likes');
             postLikes.forEach(post => {
+
                 // Add likes functionality to each post
                 showLikes(post);
-                showLikesCount(post);             
+
+                let likeImg = post.querySelector('.likes-logo');
+                likeImg.addEventListener('click', function() {
+                    fetch(`/${post.parentElement.dataset.user}/post/${post.parentElement.dataset.id}/addlikes`)
+                    .then(response => response.json())
+                    .then(ps => {
+
+                        if (ps["add_like"] === 'true') {
+                            unLike(post);
+                        } else {
+                            addLike(post);
+                        }
+                    })
+
+                })
             });
 
             newPost();
         })
 
 
-        function addLike(post) {
+        function addLike(post, ps) {
             let post_id = post.parentElement.dataset.id;
             let post_user = post.parentElement.dataset.user;
             
@@ -196,20 +196,15 @@
             .then(result => {
                 
                 if (result["status"] === 'success') {
-                    // document.querySelectorAll('[data-id]').className = 'likes-logo';
-                    showLikesCount(post);
-
                     post.querySelector('.likes-logo').src = "/static/images/like.png";
-                    //window.history.replaceState( "http://127.0.0.1:8000/" , "", "http://127.0.0.1:8000/" );
-                    showLikes(post);
-
-                    location.reload();
+                    // showLikesCount(post);
+                    showLikes(post);                    
                 }
             });
 
         }
 
-        function unLike(post) {
+        function unLike(post, ps) {
             let post_id = post.parentElement.dataset.id;
             let post_user = post.parentElement.dataset.user;
 
@@ -225,14 +220,10 @@
             .then(result => {
                 
                 if (result["status"] === 'success') {
-                    // document.querySelectorAll('[data-id]').className = 'likes-logo';
-                    showLikesCount(post);
-
                     post.querySelector('.likes-logo').src = "/static/images/unlike.png";
-                    //window.history.replaceState( "http://127.0.0.1:8000/" , "", "http://127.0.0.1:8000/" );
-                    location.reload();
+                    // showLikesCount(post);
+                    showLikes(post); 
                 }
-
             });
 
         }
