@@ -58,19 +58,10 @@
                     {{ post.created_at }}
                 </div>
                 
-                <!-- <div class="post-likes">
-                    {% for liked in post.likers.all %}
-                        {% if liked.user == current_user %}
-                                <img src="/static/images/like.png" onclick="unLike(`{{post.id}}`, `{{ post.user }}`)" class="likes-logo">
-                        {% endif %}
-                    {% endfor %}
-                </div> -->
-
                 <div class="post-likes">
                     <img class="likes-logo" alt="likeLogo">
+                    <span class="likes-count"></span>
                 </div>
-
-
             </div>
             <!-- 
                 <div class="editPost">
@@ -129,33 +120,27 @@
     {{ json_posts|json_script:"json_posts" }}
     {{ json_cur_user|json_script:"json_cur_user" }}
     <script type="text/javascript">
+        // const curLoginUser = JSON.parse(JSON.parse(json_cur_user.text));
 
-        const curLoginUser = JSON.parse(JSON.parse(json_cur_user.text));
-    
-        document.addEventListener('DOMContentLoaded', function() {
-            
-            // Load post each time on page
+        function showLikesCount(post) {
+            fetch(`/${post.parentElement.dataset.user}/post/${post.parentElement.dataset.id}/likes_count`)
+            .then(response => response.json())
+            .then(ps => {
+                
+                let likeCount = post.querySelector('.likes-count');
+                likeCount.innerText = ps["likes"];
 
-            document.querySelector('#post-text').value = "";    // empty form after/before submitting
-            fillLikes();
-            newPost();
-        })
+            });
+        }
 
+        function showLikes(post) {
 
-        function fillLikes() {
-
-            const postLikes = document.querySelectorAll('.post-likes');
-
-            postLikes.forEach(post => {
-
-                fetch(`/${post.parentElement.dataset.user}/post/${post.parentElement.dataset.id}/addlikes`)
+            fetch(`/${post.parentElement.dataset.user}/post/${post.parentElement.dataset.id}/addlikes`)
                 .then(response => response.json())
                 .then(ps => {
 
-                    // let likeImg = document.createElement('img');
+                    // Setup attribute for like logo
                     let likeImg = post.querySelector('.likes-logo');
-                    // likeImg.className = 'likes-logo';
-                    // likeImg.src = "/static/images/like.png";
                     likeImg.setAttribute('width', 20);
                     likeImg.setAttribute('heigth', 97);
 
@@ -164,35 +149,40 @@
                     if (ps["add_like"] === 'true') {
                         // likeImg.className = 'likes-logo';
                         likeImg.src = "/static/images/like.png";
-
-                        // post.append(likeImg);
-                        // console.log(p.contains(likeImg))
                         likeImg.addEventListener('click', function() {
-                            likeImg.src = "/static/images/unlike.png";
-                            unLike(post.parentElement.dataset.id, post.parentElement.dataset.user);
-                            // return false;
+                            unLike(post);
+
                         })
                     } else if (ps["add_like"] === 'false') {
                         // likeImg.className = 'unlikes-logo';
                         likeImg.src = "/static/images/unlike.png";
-
-                        // post.append(likeImg);
-                        // console.log(p.contains(dislikeImg))
                         likeImg.addEventListener('click', function() {
-                            likeImg.src = '/static/images/like.png';
-                            addLike(post.parentElement.dataset.id, post.parentElement.dataset.user);
-                            // return false;
+                            addLike(post);
                         });
                     }
-
                     // Check element of current post
                     // console.log(post.children[0].className);
                 })
+        }
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            document.querySelector('#post-text').value = "";    // empty form after/before submitting
+            
+            const postLikes = document.querySelectorAll('.post-likes');
+            postLikes.forEach(post => {
+                // Add likes functionality to each post
+                showLikes(post);
+                showLikesCount(post);             
             });
 
-        }
+            newPost();
+        })
 
-        function addLike(post_id, post_user) {
+
+        function addLike(post) {
+            let post_id = post.parentElement.dataset.id;
+            let post_user = post.parentElement.dataset.user;
             
             // Fetch the db for the post that going to be liked
             fetch(`/${post_user}/post/${post_id}/addlikes`, {
@@ -207,14 +197,21 @@
                 
                 if (result["status"] === 'success') {
                     // document.querySelectorAll('[data-id]').className = 'likes-logo';
-                    window.history.replaceState( "http://127.0.0.1:8000/" , "", "http://127.0.0.1:8000/" );
-                }
+                    showLikesCount(post);
 
+                    post.querySelector('.likes-logo').src = "/static/images/like.png";
+                    //window.history.replaceState( "http://127.0.0.1:8000/" , "", "http://127.0.0.1:8000/" );
+                    showLikes(post);
+
+                    location.reload();
+                }
             });
 
         }
 
-        function unLike(post_id, post_user) {
+        function unLike(post) {
+            let post_id = post.parentElement.dataset.id;
+            let post_user = post.parentElement.dataset.user;
 
             // Fetch the db for the post that going to be liked
             fetch(`/${post_user}/post/${post_id}/dislikes`, {
@@ -229,7 +226,11 @@
                 
                 if (result["status"] === 'success') {
                     // document.querySelectorAll('[data-id]').className = 'likes-logo';
-                    window.history.replaceState( "http://127.0.0.1:8000/" , "", "http://127.0.0.1:8000/" );
+                    showLikesCount(post);
+
+                    post.querySelector('.likes-logo').src = "/static/images/unlike.png";
+                    //window.history.replaceState( "http://127.0.0.1:8000/" , "", "http://127.0.0.1:8000/" );
+                    location.reload();
                 }
 
             });
@@ -264,6 +265,8 @@
 
             const posts = document.querySelectorAll('.postItem');
             posts.forEach(post => {
+
+                console.log(post);
 
                 if (post.dataset.id === post_id) {
 
@@ -303,7 +306,6 @@
                         }
 
                         // return false;
-                        window.history.replaceState( "http://127.0.0.1:8000/" , "", "http://127.0.0.1:8000/" );
                     })
                 }
             })

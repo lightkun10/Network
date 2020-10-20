@@ -132,8 +132,6 @@ def user_profile(request, username):
 # View for current user's following posts
 def following_view(request, username):
 
-    # print(username)
-
     return render(request, "network/following.html", {'username': username})
     # return HttpResponse("OK")
 
@@ -187,10 +185,22 @@ def single_post(request, username, post_id):
     else:
         user = get_user(request)
         post = Post.objects.get(pk=post_id)
+        post_likes_count = post.likers.all().count()
         return render(request, "network/editpost.html", {
             'user': user,
             'post': post
         })
+
+
+@csrf_exempt
+@login_required
+def post_likers_count(request, username, post_id):
+
+    # GET
+    if request.method == "GET":
+        post = Post.objects.get(pk=post_id)
+        post_likes_count = post.likers.all().count()
+        return JsonResponse({"likes": post_likes_count}, status=200)
 
 
 @csrf_exempt
@@ -214,6 +224,8 @@ def addlikes(request, username, post_id):
 
         # Check if logged in user is liking the post 
         user_likes = get_user(request).likes.all()
+        liked_post = Post.objects.get(pk=post_id) # a Post object
+        liked_post_count = liked_post.likers.all().count()
 
         try:
             if get_user(request).likes.get(post=post_id):
@@ -222,7 +234,8 @@ def addlikes(request, username, post_id):
                 add_like = False
                 pass
         
-        return JsonResponse({'add_like': str(add_like).lower()}, status=200)
+        return JsonResponse({'add_like': str(add_like).lower(), 
+                        'post_like_count': liked_post_count}, status=200)
 
 
 @csrf_exempt
