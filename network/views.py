@@ -91,7 +91,6 @@ def user_profile(request, username):
         json_user = json.dumps(user.serialize())
 
         return render(request, "network/profile.html", {
-            'user': cur_user,
             'select_user': json_user,
             'is_user': str(is_user).lower(),
             'is_following': str(is_following).lower()
@@ -235,7 +234,7 @@ def addlikes(request, username, post_id):
                 pass
         
         return JsonResponse({'add_like': str(add_like).lower(), 
-                        'post_like_count': liked_post_count}, status=200)
+                        'post_like_count': liked_post_count, 'post_id': post_id}, status=200)
 
 
 @csrf_exempt

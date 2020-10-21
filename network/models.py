@@ -9,10 +9,12 @@ class User(AbstractUser):
 
     def serialize(self):
         return {
+            "id": self.id,
             "username": self.username,
             "followers": self.followers.all().count(),
             "followings": self.followings.all().count(),
-            "posts": [post.text for post in self.posts.order_by("-created_at").all()],
+            # "posts": [post.text for post in self.posts.order_by("-created_at").all()],
+            "posts": [{'id': post.id, 'text': post.text} for post in self.posts.order_by("-created_at").all()],
             "following_user": [ following.user_follow.username for following in self.followings.all()]
         }
 

@@ -1,27 +1,32 @@
 
 document.addEventListener('DOMContentLoaded', function() {
-    
+
+        
     let isUserLoggedIn = JSON.parse(JSON.parse(is_user.text))
-    user = JSON.parse(JSON.parse(select_user.text));
-    isFollowing = JSON.parse(JSON.parse(is_following.text));
-    isFollowing ? console.log(`You are following this acc`) : console.log("You aren't following this acc");
+    let user = JSON.parse(JSON.parse(select_user.text));
+    let isFollowing = JSON.parse(JSON.parse(is_following.text));
+
+    // console.log(user['posts']);
 
     let username = user["username"];
+    let id = user["id"];
     let followers = user["followers"];
     let followings = user["followings"];
-    let posts = user["posts"]; // NOTE: It's an array.
+    let posts = user['posts']; // NOTE: It's an array.
+
+    // console.log(Array.isArray(posts));
 
     fill_username(username);
     fill_followers(username, followers);
     fill_followings(username, followings);
-    fill_posts(username, posts);
+    fill_posts(id, username, posts);
 
     if (!isUserLoggedIn) fill_flwbtn(username);
 
     if (!isUserLoggedIn) {
         const followBtn = document.querySelector('.followBtn');
         followBtn.addEventListener('click', function() {
-            console.log('Button clicked');
+            // console.log('Button clicked');
 
             let update = !isFollowing
     
@@ -34,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(result => {
-                console.log(result);
+                // console.log(result);
                 location.reload(); // refresh the current page
             })
         });
@@ -42,12 +47,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 
-function fill_posts(username, posts) {
+function fill_posts(id, username, posts) {
     
     posts.forEach(post => {
 
+        const id = post.id;
+        const post_text = post.text;
+
         let postSection = document.createElement('div');
-        postSection.className = 'post-section';
+        postSection.className = 'postItem post-section';
+        postSection.setAttribute('data-post', id);
 
         // NOTE Here might be good If I insert profile info and date created...
 
@@ -57,8 +66,42 @@ function fill_posts(username, posts) {
 
         let postText = document.createElement('div');
         postText.className = 'post-text';
-        postText.innerHTML = `${post}`
+        postText.innerHTML = `${post_text}`
         postSection.appendChild(postText);
+
+        let postLikes = document.createElement('div');
+        postLikes.className = 'post-likes';
+        let likeLogo = document.createElement("img");
+        likeLogo.className = 'likes-logo';
+        const likesCounts = document.createElement("span");
+        likesCounts.className = 'likes-count';
+        postLikes.appendChild(likeLogo);
+        postLikes.appendChild(likesCounts)
+        postSection.appendChild(postLikes);
+
+        showLikes(username, id);
+
+        likeLogo.addEventListener('click', function() {
+            fetch(`/${username}/post/${id}/addlikes`)
+            .then(response => response.json())
+            .then(ps => {
+                // console.log(ps["post_id"])
+
+                if (ps["add_like"] === 'true') {
+                    // console.log("You want to dislike this post");
+                    console.log(post);
+                    let postDiv = document.querySelector(`[data-post='${ps["post_id"]}']`);
+                    // console.log(p)
+                    unLike(username, id, postDiv);
+                } else {
+                    // console.log("You want to like this post");
+                    console.log(post);
+                    let postDiv = document.querySelector(`[data-post='${ps["post_id"]}']`);
+                    // console.log(p)
+                    addLike(username, id, postDiv);
+                }
+            });
+        });
 
         document.querySelector('.posts-section').append(postSection);
     });
@@ -88,8 +131,8 @@ function fill_followings(username, followings) {
 }
 
 function fill_flwbtn(username) {
-    console.log("you can follow this user");
-    isFollowing ? console.log("But you already follow this user, though...") : "";
+    // console.log("you can follow this user");
+    // isFollowing ? console.log("But you already follow this user, though...") : "";
 
     
     fb = document.createElement('button');
@@ -100,4 +143,76 @@ function fill_flwbtn(username) {
     // fb.className = 'followBtn btn btn-outline-primary';
 
     document.querySelector('.followBtn-section').append(fb);
+}
+
+function showLikes(username, postid) {
+    
+    fetch(`/${username}/post/${postid}/addlikes`)
+    .then(response => response.json())
+    .then(ps => {
+        
+        let p = document.querySelector(`[data-post='${postid}']`)
+        let likeImg = p.querySelector('.likes-logo');
+        likeImg.setAttribute('width', 20);
+        likeImg.setAttribute('heigth', 97);
+
+        showLikesCount(username, postid);
+
+        likeImg.src = ps["add_like"] === 'true' ? "/static/images/like.png" : "/static/images/unlike.png";
+    })
+
+}
+
+function showLikesCount(username, postid) {
+    fetch(`/${username}/post/${postid}/likes_count`)
+    .then(response => response.json())
+    .then(ps => {
+        let postDiv = document.querySelector(`[data-post='${postid}']`)
+        let likeCount = postDiv.querySelector('.likes-count');
+        likeCount.innerText = ps["likes"];
+    })
+}
+
+function addLike(username, id, postDiv) {
+    
+    // Fetch the db for the post that going to be liked
+    fetch(`/${username}/post/${id}/addlikes`, {
+        method: 'POST',
+        body: JSON.stringify({
+            post_author: username,
+            post_id: id
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        
+        if (result["status"] === 'success') {
+            postDiv.querySelector('.likes-logo').src = "/static/images/like.png";
+            // showLikesCount(post);
+            showLikes(username, id);
+        }
+    });
+
+}
+
+function unLike(username, id, postDiv) {
+    
+    // Fetch the db for the post that going to be liked
+    fetch(`/${username}/post/${id}/dislikes`, {
+        method: 'POST',
+        body: JSON.stringify({
+            post_author: username,
+            post_id: id
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        
+        if (result["status"] === 'success') {
+            postDiv.querySelector('.likes-logo').src = "/static/images/unlike.png";
+            // showLikesCount(post);
+            showLikes(username, id);
+        }
+    });
+
 }

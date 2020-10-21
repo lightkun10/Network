@@ -54,6 +54,7 @@
                         {{ post.text }}
                     </div>
                 </div>
+                
                 <div class="post-time">
                     {{ post.created_at }}
                 </div>
@@ -100,7 +101,7 @@
             {% if page_obj.has_next %}
                 <li class="page-item">
                     <span class="page-link">
-                        <a href="?page={{ page_obj_next_page_number }}">Next</a>
+                        <a href="?page={{ page_obj.next_page_number }}">Next</a>
                     </span>
                 </li>
             {% else %}
@@ -122,16 +123,34 @@
     <script type="text/javascript">
         // const curLoginUser = JSON.parse(JSON.parse(json_cur_user.text));
 
-        function showLikesCount(post) {
-            fetch(`/${post.parentElement.dataset.user}/post/${post.parentElement.dataset.id}/likes_count`)
-            .then(response => response.json())
-            .then(ps => {
-                
-                let likeCount = post.querySelector('.likes-count');
-                likeCount.innerText = ps["likes"];
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // empty form after/before submitting
+            document.querySelector('#post-text').value = "";
+            
+            const postLikes = document.querySelectorAll('.post-likes');
+            postLikes.forEach(post => {
+                // Add like/unlike logo to all posts
+                showLikes(post);
 
+                // Attach the logo with click functionality to like/unlike each post
+                let likeImg = post.querySelector('.likes-logo');
+                likeImg.addEventListener('click', function() {
+                    fetch(`/${post.parentElement.dataset.user}/post/${post.parentElement.dataset.id}/addlikes`)
+                    .then(response => response.json())
+                    .then(ps => {
+                        if (ps["add_like"] === 'true') {
+                            unLike(post);
+                        } else {
+                            addLike(post);
+                        }
+                    })
+                })
             });
-        }
+
+            newPost();
+        })
+
 
         function showLikes(post) {
 
@@ -149,35 +168,18 @@
                     likeImg.src = ps["add_like"] === 'true' ? "/static/images/like.png" : "/static/images/unlike.png";
                 })
         }
-    
-        document.addEventListener('DOMContentLoaded', function() {
-            
-            document.querySelector('#post-text').value = "";    // empty form after/before submitting
-            
-            const postLikes = document.querySelectorAll('.post-likes');
-            postLikes.forEach(post => {
 
-                // Add likes functionality to each post
-                showLikes(post);
 
-                let likeImg = post.querySelector('.likes-logo');
-                likeImg.addEventListener('click', function() {
-                    fetch(`/${post.parentElement.dataset.user}/post/${post.parentElement.dataset.id}/addlikes`)
-                    .then(response => response.json())
-                    .then(ps => {
+        function showLikesCount(post) {
+            fetch(`/${post.parentElement.dataset.user}/post/${post.parentElement.dataset.id}/likes_count`)
+            .then(response => response.json())
+            .then(ps => {
+                
+                let likeCount = post.querySelector('.likes-count');
+                likeCount.innerText = ps["likes"];
 
-                        if (ps["add_like"] === 'true') {
-                            unLike(post);
-                        } else {
-                            addLike(post);
-                        }
-                    })
-
-                })
             });
-
-            newPost();
-        })
+        }
 
 
         function addLike(post, ps) {
@@ -221,7 +223,6 @@
                 
                 if (result["status"] === 'success') {
                     post.querySelector('.likes-logo').src = "/static/images/unlike.png";
-                    // showLikesCount(post);
                     showLikes(post); 
                 }
             });
@@ -242,7 +243,6 @@
                 .then(result => {
                     // Print result on browser's console
                     console.log(result);
-                    
                     location.reload();
                 });
 
