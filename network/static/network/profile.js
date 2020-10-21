@@ -4,7 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
     let isUserLoggedIn = JSON.parse(JSON.parse(is_user.text))
     let user = JSON.parse(JSON.parse(select_user.text));
-    let isFollowing = JSON.parse(JSON.parse(is_following.text));
+    isFollowing = JSON.parse(JSON.parse(is_following.text));
+    isFollowing ? console.log(`You are following this acc`) : console.log("You aren't following this acc");
 
     // console.log(user['posts']);
 
